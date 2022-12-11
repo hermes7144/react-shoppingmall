@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { v4 as uuid } from 'uuid'
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
-import { getDatabase, ref, set, get } from "firebase/database";
+import { getDatabase, ref, set, get, remove } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -66,6 +66,21 @@ export async function getProducts() {
       {
         return Object.values(snapshot.val())
       }
-
     })
+}
+
+export async function getCart(userId) {
+  return get(ref(database, `carts/${userId}`))
+    .then(snapshot => {
+      const items = snapshot.val() || {};
+      return Object.values(items)
+    })
+}
+
+export async function addorUpdateCarts(userId, product) {
+  set(ref(database, `carts/${userId}/${product.id}`), product)
+}
+
+export async function removeFromCart(userId, product) {
+  remove(ref(database, `carts/${userId}/${product.id}`))
 }
